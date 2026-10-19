@@ -1,0 +1,17 @@
+{
+  "name": "plate-link",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "db:types": "supabase gen types typescript --project-id $SUPABASE_PROJECT_REF --schema public > packages/shared/src/database.types.ts"
+  },
+  "devDependencies": {
+    "supabase": "^2.121.0",
+    "turbo": "^2.11.9",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.28.0"
+}

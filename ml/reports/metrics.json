@@ -1,0 +1,72 @@
+{
+  "point_accuracy_rmsle": {
+    "model_median": 0.49229034322529114,
+    "naive_last_week": 0.6456796097407768,
+    "mean_last_4": 0.6019420278828178
+  },
+  "quantile_coverage": {
+    "P10": 0.09525144559313124,
+    "P25": 0.2302786052216576,
+    "P50": 0.47390923427369896,
+    "P75": 0.732258629752935,
+    "P90": 0.8944103732258629
+  },
+  "newsvendor": {
+    "cost_share": 0.4,
+    "tau_star": 0.6,
+    "policies": {
+      "cook_last_week": {
+        "prepared": 7376130.0,
+        "leftover": 1290066.0,
+        "leftover_pct": 17.489740555006488,
+        "stockout_units": 1181015.0,
+        "fill_rate_pct": 83.74842216521934,
+        "profit": 868973750.21
+      },
+      "cook_4wk_average": {
+        "prepared": 7590535.0,
+        "leftover": 1441204.0,
+        "leftover_pct": 18.986856657666422,
+        "stockout_units": 1117748.0,
+        "fill_rate_pct": 84.61901955379871,
+        "profit": 849493859.6199999
+      },
+      "plate_link_model": {
+        "prepared": 7541503.0,
+        "leftover": 1152601.0,
+        "leftover_pct": 15.283438858275334,
+        "stockout_units": 878177.0,
+        "fill_rate_pct": 87.9156811147918,
+        "profit": 949512400.96
+      }
+    }
+  },
+  "best_iteration": 382,
+  "feature_importance_gain": {
+    "promo_announced": 159170.0,
+    "log_scale": 92566.3,
+    "discount_pct": 53728.3,
+    "trend": 37706.9,
+    "cv4": 37125.8,
+    "rel_lag1": 35226.1,
+    "promo_featured": 15318.8,
+    "cat_Seafood": 9356.5,
+    "rel_lag4": 9339.1,
+    "cui_Continental": 8701.8,
+    "rel_lag2": 6946.3,
+    "cat_Pizza": 6486.4
+  },
+  "summary": {
+    "test_weeks": "136\u2013145",
+    "test_rows": 28535,
+    "rmsle_model": 0.4923,
+    "rmsle_naive": 0.6457,
+    "leftover_pct_naive": 17.5,
+    "leftover_pct_model": 15.3,
+    "leftover_reduction_pct": 10.7,
+    "profit_uplift_pct": 9.3,
+    "fill_rate_model_pct": 87.9,
+    "fill_rate_naive_pct": 83.7,
+    "cost_share_assumed": 0.4
+  }
+}

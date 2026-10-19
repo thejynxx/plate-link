@@ -1,0 +1,387 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Plate-Link design tokens — mirrors packages/shared/src/design-tokens.ts
+ * Palette: Gunmetal #32373B · Iron Grey #4A5859 · Almond Silk #F4D6CC
+ *          Honey Bronze #F4B860 · Blushed Brick #C83E4D
+ */
+:root {
+  --radius: 0.875rem;
+  --background: #fbf7f5;
+  --foreground: #32373b;
+  --card: #ffffff;
+  --card-foreground: #32373b;
+  --popover: #ffffff;
+  --popover-foreground: #32373b;
+  --primary: #c83e4d;
+  --primary-hover: #b33645;
+  --primary-edge: #8f2a36;
+  --primary-foreground: #ffffff;
+  --secondary: #f4d6cc;
+  --secondary-foreground: #8f2a36;
+  --muted: #f6eeea;
+  --muted-foreground: #4a5859;
+  --accent: #f4b860;
+  --accent-edge: #c98f3a;
+  --accent-foreground: #32373b;
+  --almond: #f4d6cc;
+  --destructive: #b3261e;
+  --border: #eadbd4;
+  --border-strong: #d9c3ba;
+  --input: #d9c3ba;
+  --ring: #f4b860;
+  --chrome: #32373b;
+  --chrome-foreground: #f6e6df;
+  --chrome-muted: #a9b4b5;
+  --link: #b33645;
+  --sidebar: #32373b;
+
+  --success: #4a5859;
+  --warning: #f4b860;
+  --info: #4a5859;
+}
+
+.dark {
+  --background: #1e2225;
+  --foreground: #f6eeea;
+  --card: #272c30;
+  --card-foreground: #f6eeea;
+  --popover: #272c30;
+  --popover-foreground: #f6eeea;
+  --primary: #c83e4d;
+  --primary-hover: #d24a59;
+  --primary-edge: #7c2330;
+  --primary-foreground: #ffffff;
+  --secondary: #4a3a37;
+  --secondary-foreground: #f4d6cc;
+  --muted: #22272a;
+  --muted-foreground: #b7c2c2;
+  --accent: #f4b860;
+  --accent-edge: #b97f2e;
+  --accent-foreground: #1e2225;
+  --almond: #4a3a37;
+  --destructive: #f2766b;
+  --border: #3a4246;
+  --border-strong: #4a5859;
+  --input: #4a5859;
+  --ring: #f4b860;
+  --chrome: #16191b;
+  --chrome-foreground: #f6e6df;
+  --chrome-muted: #9aa6a7;
+  --link: #ee8a95;
+  --sidebar: #16191b;
+
+  --success: #b7c2c2;
+  --warning: #f4b860;
+  --info: #b7c2c2;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-bricolage), var(--font-geist-sans);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-edge: var(--primary-edge);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-edge: var(--accent-edge);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-almond: var(--almond);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chrome: var(--chrome);
+  --color-chrome-foreground: var(--chrome-foreground);
+  --color-chrome-muted: var(--chrome-muted);
+  --color-link: var(--link);
+  --color-sidebar: var(--sidebar);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-gunmetal: #32373b;
+  --color-iron: #4a5859;
+  --color-honey: #f4b860;
+  --color-brick: #c83e4d;
+  --color-silk: #f4d6cc;
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 3px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/60;
+  }
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    letter-spacing: -0.015em;
+  }
+  ::selection {
+    background: var(--accent);
+    color: #32373b;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* ---------------------------------------------------------------- tactile buttons
+ * Inspired by uiverse.io "3D push" buttons (MIT): the face sits on a darker edge
+ * and physically travels down when pressed.
+ */
+@layer components {
+  .btn-press {
+    --edge: var(--primary-edge);
+    --depth: 4px;
+    position: relative;
+    isolation: isolate;
+    transform: translateY(0);
+    box-shadow: 0 var(--depth) 0 0 var(--edge);
+    transition:
+      transform 120ms cubic-bezier(0.3, 0.7, 0.4, 1),
+      box-shadow 120ms cubic-bezier(0.3, 0.7, 0.4, 1),
+      background-color 150ms ease,
+      filter 150ms ease;
+    margin-bottom: var(--depth);
+  }
+  .btn-press:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 calc(var(--depth) + 1px) 0 0 var(--edge);
+  }
+  .btn-press:active:not(:disabled) {
+    transform: translateY(calc(var(--depth) - 1px));
+    box-shadow: 0 1px 0 0 var(--edge);
+    transition-duration: 40ms;
+  }
+  /* light sweep across primary buttons on hover */
+  .btn-shine {
+    overflow: hidden;
+  }
+  .btn-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.28) 50%, transparent 70%);
+    transform: translateX(-120%);
+    pointer-events: none;
+  }
+  .btn-shine:hover:not(:disabled)::after {
+    transform: translateX(120%);
+    transition: transform 650ms ease;
+  }
+
+  /* ---------------------------------------------------------------- inputs
+   * Thick border, inset well, glowing honey ring + lift on focus.
+   */
+  .input-well {
+    background: var(--card);
+    border: 2px solid var(--input);
+    box-shadow: inset 0 2px 0 0 rgb(50 55 59 / 0.05);
+    transition:
+      border-color 150ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease,
+      background-color 150ms ease;
+  }
+  .input-well:hover:not(:disabled):not(:focus) {
+    border-color: color-mix(in oklab, var(--input), var(--foreground) 25%);
+  }
+  .input-well:focus,
+  .input-well:focus-within {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow:
+      0 0 0 4px color-mix(in oklab, var(--accent) 45%, transparent),
+      0 6px 16px -10px rgb(50 55 59 / 0.45);
+    transform: translateY(-1px);
+  }
+  .input-well[aria-invalid="true"] {
+    border-color: var(--destructive);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--destructive) 18%, transparent);
+  }
+
+  /* floating label (uiverse "label lifts into the border") */
+  .float-field {
+    position: relative;
+  }
+  .float-field > input {
+    padding-top: 1.25rem;
+  }
+  .float-field > label {
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted-foreground);
+    font-size: 0.9375rem;
+    pointer-events: none;
+    transition: all 160ms ease;
+  }
+  .float-field > input:focus + label,
+  .float-field > input:not(:placeholder-shown) + label {
+    top: 0.85rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary);
+  }
+  .dark .float-field > input:focus + label,
+  .dark .float-field > input:not(:placeholder-shown) + label {
+    color: var(--accent);
+  }
+
+  /* choice chips that press like keys */
+  .chip {
+    border: 2px solid var(--border-strong);
+    background: var(--card);
+    box-shadow: 0 3px 0 0 var(--border-strong);
+    transition: transform 100ms ease, box-shadow 100ms ease, border-color 150ms ease, background-color 150ms ease;
+  }
+  .chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 0 var(--border-strong);
+  }
+  .chip:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 0 var(--border-strong);
+  }
+  .chip[aria-checked="true"],
+  .chip[data-active="true"] {
+    border-color: var(--foreground);
+    background: var(--accent);
+    color: #32373b;
+    box-shadow: 0 3px 0 0 var(--foreground);
+  }
+  .dark .chip[aria-checked="true"],
+  .dark .chip[data-active="true"] {
+    border-color: var(--accent-edge);
+    box-shadow: 0 3px 0 0 var(--accent-edge);
+  }
+
+  /* ---------------------------------------------------------------- KOT ticket
+   * Listing cards look like kitchen order tickets: tear-off notches on both
+   * sides and a dashed perforation between header and body.
+   */
+  .ticket {
+    --notch: 9px;
+    --notch-y: calc(100% - 41px); /* lines up with the perforation */
+    position: relative;
+    background: var(--card);
+    border-radius: 14px;
+    mask:
+      radial-gradient(circle var(--notch) at 0 var(--notch-y), transparent 98%, #000) left / 51% 100% no-repeat,
+      radial-gradient(circle var(--notch) at 100% var(--notch-y), transparent 98%, #000) right / 51% 100% no-repeat;
+  }
+  .ticket-perf {
+    border-top: 2px dashed var(--border-strong);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-press,
+  .btn-press:hover,
+  .btn-press:active,
+  .chip,
+  .input-well {
+    transition: none !important;
+    transform: none !important;
+  }
+  .btn-shine::after {
+    display: none;
+  }
+}
+
+/* MapLibre controls follow the theme */
+.dark .maplibregl-ctrl-group {
+  background: var(--card);
+}
+.dark .maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+  filter: invert(1);
+}
+.maplibregl-ctrl-attrib {
+  font-size: 10px;
+}
+.maplibregl-popup-content {
+  background: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 30px -12px rgb(0 0 0 / 0.5);
+  padding: 12px 14px;
+}
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  border-top-color: var(--card);
+}
+.maplibregl-popup-anchor-top .maplibregl-popup-tip,
+.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+  border-bottom-color: var(--card);
+}
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--card);
+}
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--card);
+}
+.maplibregl-popup-close-button {
+  color: var(--muted-foreground);
+  padding: 4px 8px;
+  font-size: 16px;
+}
+.maplibregl-popup-close-button:hover {
+  background: transparent;
+  color: var(--foreground);
+}
+
+/* Landing: tickets fan in once on load */
+@keyframes land-ticket {
+  from {
+    opacity: 0;
+    translate: 0 28px;
+    scale: 0.96;
+  }
+}
+.land-ticket {
+  animation: land-ticket 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .land-ticket {
+    animation: none;
+  }
+}
