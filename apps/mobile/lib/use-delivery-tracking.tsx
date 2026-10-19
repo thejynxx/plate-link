@@ -418,8 +418,8 @@ export function DeliveryLocationPermissionBanner() {
       style={[
         styles.banner,
         {
-          backgroundColor: isDark ? "#2A1D1A" : "#FDF2F2",
-          borderColor: theme.palette.blushedBrick,
+          backgroundColor: theme.colors.surfaceSunken,
+          borderColor: theme.colors.danger,
         },
       ]}
     >

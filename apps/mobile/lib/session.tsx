@@ -7,6 +7,7 @@ import React, {
 } from "react"
 import type { Session, User } from "@supabase/supabase-js"
 import type { Tables } from "@platelink/shared"
+import { stopLocationUpdatesTask } from "./location-task"
 import { supabase } from "./supabase"
 
 export type UserProfile = Tables<"users">
@@ -121,6 +122,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = useCallback(async () => {
     try {
+      await stopLocationUpdatesTask()
       await supabase.auth.signOut()
     } catch (err) {
       console.warn("Error signing out:", err)

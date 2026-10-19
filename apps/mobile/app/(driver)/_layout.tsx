@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabase"
 import { useTheme } from "@/theme"
 
 export default function DriverTabsLayout() {
-  const { theme, isDark } = useTheme()
+  const { theme } = useTheme()
   const { user } = useSession()
   const queryClient = useQueryClient()
 
@@ -57,15 +57,15 @@ export default function DriverTabsLayout() {
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: isDark ? "#16191B" : palette.gunmetal,
-            borderTopColor: isDark ? "#2A3135" : "#3E4549",
+            backgroundColor: theme.colors.chrome,
+            borderTopColor: theme.colors.borderStrong,
             borderTopWidth: 1,
             height: 60,
             paddingBottom: 6,
             paddingTop: 6,
           },
-          tabBarActiveTintColor: palette.honeyBronze,
-          tabBarInactiveTintColor: "#9AA6A7",
+          tabBarActiveTintColor: theme.colors.accent,
+          tabBarInactiveTintColor: theme.colors.chromeMuted,
           tabBarLabelStyle: {
             fontFamily: theme.fonts.bodyMedium,
             fontSize: 11,
@@ -107,16 +107,22 @@ export default function DriverTabsLayout() {
             ),
           }}
         />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ color, size }) => (
-            <User size={size - 2} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: "Profile",
+            tabBarIcon: ({ color, size }) => (
+              <User size={size - 2} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="history"
+          options={{
+            href: null,
+          }}
+        />
+      </Tabs>
     </DeliveryTrackingProvider>
   )
 }

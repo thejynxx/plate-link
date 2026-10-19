@@ -16,7 +16,6 @@ import {
   chatKeys,
   fetchConversations,
   palette,
-  type Conversation,
 } from "@platelink/shared"
 import { Badge, EmptyState, ErrorState, Skeleton, Text } from "@/components/ui"
 import { supabase } from "@/lib/supabase"
@@ -24,7 +23,7 @@ import { useTheme } from "@/theme"
 
 export function ChatInbox() {
   const router = useRouter()
-  const { theme, isDark } = useTheme()
+  const { theme } = useTheme()
   const queryClient = useQueryClient()
 
   // 1. Fetch conversations inbox
@@ -159,9 +158,7 @@ export function ChatInbox() {
               styles.conversationRow,
               {
                 backgroundColor: pressed
-                  ? isDark
-                    ? "#202528"
-                    : "#F5F0EC"
+                  ? theme.colors.surfaceSunken
                   : theme.colors.surface,
                 borderBottomColor: theme.colors.border,
               },

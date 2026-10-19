@@ -2,10 +2,24 @@ import "react-native-url-polyfill/auto"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { createClient } from "@supabase/supabase-js"
 import * as TaskManager from "expo-task-manager"
-import type * as Location from "expo-location"
+import * as Location from "expo-location"
 import type { Database } from "@platelink/shared"
 
 export const DRIVER_LOCATION_TASK = "pl-driver-location"
+
+/**
+ * Stops the background location task if currently active.
+ */
+export async function stopLocationUpdatesTask() {
+  try {
+    const isStarted = await Location.hasStartedLocationUpdatesAsync(DRIVER_LOCATION_TASK)
+    if (isStarted) {
+      await Location.stopLocationUpdatesAsync(DRIVER_LOCATION_TASK)
+    }
+  } catch (err) {
+    console.warn("[location-task] Failed to stop task:", err)
+  }
+}
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL ?? ""
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? ""
@@ -97,6 +111,21 @@ TaskManager.defineTask(
       }
 
       const driverId = session.user.id
+
+      // Edge case: if order was completed, cancelled, or released remotely, stop the task
+      const { data: activeDelivery } = await bgSupabase
+        .from("orders")
+        .select("id")
+        .eq("driver_id", driverId)
+        .in("status", ["driver_assigned", "on_the_way"])
+        .limit(1)
+        .maybeSingle()
+
+      if (!activeDelivery) {
+        await Location.stopLocationUpdatesAsync(DRIVER_LOCATION_TASK).catch(() => {})
+        return
+      }
+
       const { latitude, longitude, heading, speed } = latestLocation.coords
 
       const { error: upsertError } = await bgSupabase

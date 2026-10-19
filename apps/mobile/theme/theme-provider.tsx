@@ -1,12 +1,16 @@
-import React, { createContext, useContext, useMemo, useState } from "react"
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react"
 import { useColorScheme } from "react-native"
 import { StatusBar } from "expo-status-bar"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import { darkTheme, lightTheme, type ColorSchemeMode, type Theme } from "./tokens"
+
+const THEME_STORAGE_KEY = "platelink_theme_mode"
 
 interface ThemeContextValue {
   theme: Theme
   isDark: boolean
   mode: ColorSchemeMode
+  preference: ColorSchemeMode | "system"
   toggleMode: () => void
   setMode: (mode: ColorSchemeMode | "system") => void
 }
@@ -20,27 +24,41 @@ export interface ThemeProviderProps {
 
 export function ThemeProvider({ children, defaultMode = "system" }: ThemeProviderProps) {
   const systemScheme = useColorScheme()
-  const [overrideMode, setOverrideMode] = useState<ColorSchemeMode | "system">(defaultMode)
+  const [preference, setPreference] = useState<ColorSchemeMode | "system">(defaultMode)
+
+  // Load persisted theme preference from AsyncStorage
+  useEffect(() => {
+    AsyncStorage.getItem(THEME_STORAGE_KEY)
+      .then((saved) => {
+        if (saved === "system" || saved === "light" || saved === "dark") {
+          setPreference(saved)
+        }
+      })
+      .catch((err) => {
+        console.warn("[theme] Failed to load persisted theme preference:", err)
+      })
+  }, [])
 
   const activeMode: ColorSchemeMode = useMemo(() => {
-    if (overrideMode === "system") {
+    if (preference === "system") {
       return systemScheme === "dark" ? "dark" : "light"
     }
-    return overrideMode
-  }, [overrideMode, systemScheme])
+    return preference
+  }, [preference, systemScheme])
 
   const isDark = activeMode === "dark"
   const theme = isDark ? darkTheme : lightTheme
 
-  const toggleMode = () => {
-    setOverrideMode((prev) => {
-      const current = prev === "system" ? (systemScheme === "dark" ? "dark" : "light") : prev
-      return current === "dark" ? "light" : "dark"
+  const setMode = (mode: ColorSchemeMode | "system") => {
+    setPreference(mode)
+    AsyncStorage.setItem(THEME_STORAGE_KEY, mode).catch((err) => {
+      console.warn("[theme] Failed to persist theme preference:", err)
     })
   }
 
-  const setMode = (mode: ColorSchemeMode | "system") => {
-    setOverrideMode(mode)
+  const toggleMode = () => {
+    const nextMode: ColorSchemeMode = activeMode === "dark" ? "light" : "dark"
+    setMode(nextMode)
   }
 
   const value = useMemo<ThemeContextValue>(
@@ -48,10 +66,11 @@ export function ThemeProvider({ children, defaultMode = "system" }: ThemeProvide
       theme,
       isDark,
       mode: activeMode,
+      preference,
       toggleMode,
       setMode,
     }),
-    [theme, isDark, activeMode]
+    [theme, isDark, activeMode, preference]
   )
 
   return (
@@ -70,6 +89,7 @@ export function useTheme(): ThemeContextValue {
       theme: lightTheme,
       isDark: false,
       mode: "light",
+      preference: "system",
       toggleMode: () => {},
       setMode: () => {},
     }

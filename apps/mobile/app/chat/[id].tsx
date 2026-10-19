@@ -41,11 +41,11 @@ export default function ChatThreadScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const conversationId = id as string
 
-  const { theme, isDark } = useTheme()
+  const { theme } = useTheme()
   const { user } = useSession()
   const queryClient = useQueryClient()
 
-  const [messages, setMessages] = useState<ExtendedMessage[]>([])
+  const [pendingMessages, setPendingMessages] = useState<ExtendedMessage[]>([])
   const [inputText, setInputText] = useState("")
   const [isSending, setIsSending] = useState(false)
   const flatListRef = useRef<FlatList>(null)
@@ -70,22 +70,14 @@ export default function ChatThreadScreen() {
     enabled: !!conversationId,
   })
 
-  // Synchronize local messages state with initial fetch
-  useEffect(() => {
-    if (initialMessages.length > 0) {
-      setMessages((prev) => {
-        // Keep any pending optimistic messages that haven't resolved yet
-        const pendingOptimistic = prev.filter(
-          (m) => m.status === "sending" || m.status === "failed"
-        )
-        const existingIds = new Set(initialMessages.map((m) => String(m.id)))
-        const remainingPending = pendingOptimistic.filter(
-          (m) => !existingIds.has(String(m.id))
-        )
-        return [...initialMessages, ...remainingPending]
-      })
-    }
-  }, [initialMessages])
+  // Combine query messages with any pending/failed optimistic messages
+  const messages = useMemo(() => {
+    const existingIds = new Set(initialMessages.map((m) => String(m.id)))
+    const remainingPending = pendingMessages.filter(
+      (m) => !existingIds.has(String(m.id))
+    )
+    return [...initialMessages, ...remainingPending]
+  }, [initialMessages, pendingMessages])
 
   // 3. Mark conversation as read on open
   useEffect(() => {
@@ -111,23 +103,26 @@ export default function ChatThreadScreen() {
         },
         (payload) => {
           const newMsg = payload.new as Message
-          setMessages((prev) => {
-            // Avoid duplicate additions
-            if (prev.some((m) => String(m.id) === String(newMsg.id))) return prev
-            // Replace matching optimistic message if any
-            const existingOptIdx = prev.findIndex(
-              (m) =>
-                m.status === "sending" &&
-                m.sender_id === newMsg.sender_id &&
-                m.body === newMsg.body
-            )
-            if (existingOptIdx !== -1) {
-              const updated = [...prev]
-              updated[existingOptIdx] = newMsg
-              return updated
+
+          // Update query cache directly without cascading effect setState
+          queryClient.setQueryData<Message[]>(
+            chatKeys.thread(conversationId),
+            (old = []) => {
+              if (old.some((m) => String(m.id) === String(newMsg.id))) return old
+              return [...old, newMsg]
             }
-            return [...prev, newMsg]
-          })
+          )
+
+          // Remove matching optimistic message if any
+          setPendingMessages((prev) =>
+            prev.filter(
+              (m) =>
+                !(
+                  m.sender_id === newMsg.sender_id &&
+                  m.body === newMsg.body
+                )
+            )
+          )
 
           // If incoming from someone else, mark as read and invalidate inbox unread count
           if (newMsg.sender_id !== user?.id) {
@@ -181,7 +176,7 @@ export default function ChatThreadScreen() {
         status: "sending",
       }
 
-      setMessages((prev) => [...prev, optimisticMessage])
+      setPendingMessages((prev) => [...prev, optimisticMessage])
       setInputText("")
       setIsSending(true)
 
@@ -193,13 +188,20 @@ export default function ChatThreadScreen() {
           clean
         )
 
-        setMessages((prev) =>
-          prev.map((m) => (String(m.id) === tempId ? realMessage : m))
+        setPendingMessages((prev) =>
+          prev.filter((m) => String(m.id) !== tempId)
+        )
+        queryClient.setQueryData<Message[]>(
+          chatKeys.thread(conversationId),
+          (old = []) => {
+            if (old.some((m) => String(m.id) === String(realMessage.id))) return old
+            return [...old, realMessage]
+          }
         )
         queryClient.invalidateQueries({ queryKey: chatKeys.inbox() })
       } catch (err: any) {
         console.warn("[chat] Send error:", err)
-        setMessages((prev) =>
+        setPendingMessages((prev) =>
           prev.map((m) =>
             String(m.id) === tempId ? { ...m, status: "failed" } : m
           )
@@ -208,7 +210,7 @@ export default function ChatThreadScreen() {
         setIsSending(false)
       }
     },
-    [inputText, user?.id, conversationId, queryClient]
+    [inputText, user, conversationId, queryClient]
   )
 
   // 7. Retry failed optimistic message
@@ -219,13 +221,13 @@ export default function ChatThreadScreen() {
         text: "Delete",
         style: "destructive",
         onPress: () => {
-          setMessages((prev) => prev.filter((m) => String(m.id) !== String(msg.id)))
+          setPendingMessages((prev) => prev.filter((m) => String(m.id) !== String(msg.id)))
         },
       },
       {
         text: "Retry",
         onPress: () => {
-          setMessages((prev) => prev.filter((m) => String(m.id) !== String(msg.id)))
+          setPendingMessages((prev) => prev.filter((m) => String(m.id) !== String(msg.id)))
           void handleSend(msg.body)
         },
       },
