@@ -30,6 +30,7 @@ export default ({ config }: ConfigContext): ExpoConfig & { newArchEnabled?: bool
       "FOREGROUND_SERVICE",
       "FOREGROUND_SERVICE_LOCATION",
       "POST_NOTIFICATIONS",
+      "CAMERA",
     ],
   },
   web: {
@@ -41,6 +42,13 @@ export default ({ config }: ConfigContext): ExpoConfig & { newArchEnabled?: bool
     "expo-font",
     "expo-secure-store",
     "@maplibre/maplibre-react-native",
+    [
+      "expo-image-picker",
+      {
+        cameraPermission:
+          "Plate-Link uses the camera for optional pickup and delivery proof photos.",
+      },
+    ],
     [
       "expo-location",
       {

@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server"
+import { createClient as createPlainClient } from "@supabase/supabase-js"
 import { routeRequestSchema } from "@platelink/shared"
 import { createClient } from "@/lib/supabase/server"
 
@@ -27,13 +28,39 @@ function getCacheKey(coordinates: [number, number][]): string {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
+  let user: { id: string } | null = null
 
-  if (authError || !user) {
+  // 1. Check for Bearer token authorization (e.g. mobile client)
+  const authHeader = request.headers.get("authorization")
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.substring(7).trim()
+    if (token) {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      if (supabaseUrl && supabaseAnonKey) {
+        const plainSupabase = createPlainClient(supabaseUrl, supabaseAnonKey)
+        const { data, error } = await plainSupabase.auth.getUser(token)
+        if (!error && data.user) {
+          user = data.user
+        }
+      }
+    }
+  }
+
+  // 2. If no valid Bearer token, fall back to cookie session (web client)
+  if (!user) {
+    const supabase = await createClient()
+    const {
+      data: { user: cookieUser },
+      error: authError,
+    } = await supabase.auth.getUser()
+
+    if (!authError && cookieUser) {
+      user = cookieUser
+    }
+  }
+
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
