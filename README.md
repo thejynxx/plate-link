@@ -51,8 +51,10 @@
 </p>
 
 <p align="center">
+  <a href="#download-apk">Download APK</a> •
   <a href="#what-it-does">What it does</a> •
   <a href="#features">Features</a> •
+  <a href="#screenshots">Screenshots</a> •
   <a href="#how-a-donation-flows">How a donation flows</a> •
   <a href="#architecture">Architecture</a> •
   <a href="#prep-planner-ml">Prep planner (ML)</a> •
@@ -92,6 +94,57 @@
     </tr>
   </tbody>
 </table>
+
+<p align="center">
+  <img src="docs/assets/divider.svg" alt="perforated divider" width="100%" />
+</p>
+
+## Download Android app (APK)
+
+<a id="download-apk"></a>
+
+The native Android application brings volunteer driver dispatch, live background GPS telemetry, turn-by-turn navigation deep links, recipient food claims, and canteen surplus management straight to your mobile device.
+
+### Download options
+
+| Target | Format | Link | Details |
+| :--- | :--- | :--- | :--- |
+| **Direct APK download** | Standalone `.apk` | [**Download Plate-Link APK**](https://drive.google.com/uc?export=download&id=1UXZTkNJf9QYrcQjHCvD6oBh-UxarlmYx) | Signed release build, direct one-tap download (~50 MB) |
+| **Google Drive mirror** | Cloud folder | [**Open Google Drive mirror**](https://drive.google.com/open?id=1UXZTkNJf9QYrcQjHCvD6oBh-UxarlmYx) | File metadata, Google Drive virus scan check, and manual download |
+| **Scan QR on phone** | Web QR code | [**Open web app QR page**](https://plate-link-sigma.vercel.app/get-the-app) | Display scannable QR code on desktop to download on your phone |
+| **Live web app** | Progressive web app | [**Open web app**](https://plate-link-sigma.vercel.app) | Full responsive web experience hosted on Vercel |
+
+### Installation instructions (Android)
+
+Installing the release APK directly onto any Android phone takes under a minute:
+
+1. **Download the APK**  
+   Tap the [Direct APK download link](https://drive.google.com/uc?export=download&id=1UXZTkNJf9QYrcQjHCvD6oBh-UxarlmYx) from your Android browser (Chrome, Firefox, Samsung Internet).
+2. **Confirm browser prompt**  
+   Android browsers show a standard prompt for any app downloaded outside the Play Store:  
+   > *"File might be harmful. Do you want to download Plate-Link-latest.apk anyway?"*  
+   Tap **Download anyway**.
+3. **Allow installation from unknown apps**  
+   Tap the completed download banner in your notifications tray, or open your phone's **Files / Downloads** app and tap `Plate-Link-latest.apk`.  
+   - If prompted: *"For your security, your phone is not allowed to install unknown apps from this source"*, tap **Settings**.  
+   - Toggle **Allow from this source** to ON, then press your device's back button.
+4. **Complete installation & launch**  
+   Tap **Install**, then tap **Open**.  
+   - If **Google Play Protect** displays *"Unrecognized app"*, tap **More details** and then **Install anyway** (Plate-Link is an open-source project signed with our custom release key).
+5. **Sign in or create an account**  
+   Log in or register with any of the three roles:
+   - **Volunteer Driver**: View available meal pickups on an interactive map, accept deliveries, and broadcast live GPS location telemetry.
+   - **NGO / Recipient**: Browse nearby surplus food listings, claim portions with one tap, and track driver arrival live.
+   - **Canteen**: Publish surplus food with portion counts, check real-time stats, and run the ML prep planner.
+
+### System requirements
+
+- **Operating system**: Android 7.0 (Nougat, API 24) or newer (tested on Android 11, 12, 13, 14, 15)
+- **Permissions requested**:
+  - *Location (Fine & Coarse)*: For nearby canteen discovery and volunteer driver live GPS telemetry
+  - *Background location*: For continuous driver location broadcasts during active deliveries
+  - *Internet & network state*: For Supabase Realtime updates and vector tile streaming
+- **Size**: ~50 MB
 
 <p align="center">
   <img src="docs/assets/divider.svg" alt="perforated divider" width="100%" />
