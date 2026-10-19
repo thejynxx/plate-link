@@ -20,7 +20,34 @@
   <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/Tailwind%20CSS-v4-4A5859?style=flat-square&logo=tailwindcss&logoColor=06B6D4" alt="Tailwind CSS v4" /></a>
   <a href="https://lightgbm.readthedocs.io"><img src="https://img.shields.io/badge/LightGBM-Quantile%20ML-F4B860?style=flat-square&labelColor=32373B&logoColor=32373B" alt="LightGBM" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-F4D6CC?style=flat-square&labelColor=32373B&logoColor=32373B" alt="License MIT" /></a>
-  <img src="https://img.shields.io/badge/Status-Phase%203%20in%20progress-C83E4D?style=flat-square&labelColor=32373B" alt="Phase 3 in progress" />
+  <img src="https://img.shields.io/badge/Status-Complete%20(Production)-4A5859?style=flat-square&labelColor=32373B" alt="Status Complete" />
+</p>
+
+<p align="center">
+  <a href="https://drive.google.com/uc?export=download&id=1UXZTkNJf9QYrcQjHCvD6oBh-UxarlmYx">
+    <img src="https://img.shields.io/badge/Download_APK-Android-C83E4D?style=for-the-badge&logo=android&logoColor=white" alt="Download APK" />
+  </a>
+  &nbsp;
+  <a href="https://plate-link-sigma.vercel.app">
+    <img src="https://img.shields.io/badge/Open_Web_App-Vercel-32373B?style=for-the-badge&logo=vercel&logoColor=white" alt="Open Web App" />
+  </a>
+</p>
+
+<p align="center">
+  <sub>Android 7.0+, v1.0.1, ~50 MB — if Play Protect warns, tap More details → Install anyway.</sub>
+</p>
+
+<p align="center">
+  <details align="center">
+    <summary><strong>Install on Android (4 steps)</strong></summary>
+    <br/>
+    <ol align="left" style="display: inline-block; text-align: left; max-width: 560px;">
+      <li><strong>Open link on phone:</strong> Tap the download button above or open the link on your Android device (Android 7.0+).</li>
+      <li><strong>Download anyway:</strong> If Chrome or your browser warns that the file may be harmful, tap <em>Download anyway</em>.</li>
+      <li><strong>Allow unknown apps:</strong> Open the downloaded <code>.apk</code> and toggle <em>Allow from this source</em> when prompted by Android Settings.</li>
+      <li><strong>Install & launch:</strong> Tap <em>Install</em>, launch <strong>Plate-Link</strong>, and sign in. All three roles (Driver, NGO, Canteen) work natively in the app.</li>
+    </ol>
+  </details>
 </p>
 
 <p align="center">
@@ -333,8 +360,12 @@ SUPABASE_PROJECT_REF=<your-project-ref> pnpm db:types
 </details>
 
 <details>
-<summary><strong>4. Run the Android app (Expo dev build)</strong></summary>
+<summary><strong>4. Run the Android app (Expo dev build or pre-built APK)</strong></summary>
 
+**Direct APK install (recommended for real device testing):**  
+Download the signed production release APK directly: [Download Plate-Link APK](https://drive.google.com/uc?export=download&id=1UXZTkNJf9QYrcQjHCvD6oBh-UxarlmYx) (Android 7.0+). All three roles (**Volunteer Driver**, **NGO / Recipient**, and **Canteen**) are fully supported in the mobile app.
+
+**Local development build:**
 ```bash
 # Navigate to mobile directory
 cd apps/mobile
@@ -442,9 +473,9 @@ The workflow curls `${SUPABASE_URL}/rest/v1/canteens?select=id&limit=1` using `a
 
 - [x] **Phase 1: Foundation & Canteen Portal** — Role-based auth, onboarding, canteen dashboard, photo upload, ticket design system, and real-time status flips.
 - [x] **Phase 2: Recipient Web & Live Delivery Engine** — Location picker, recipient feed + MapLibre map, claim listing modal, active claims, live driver GPS tracking, OpenRouteService routing.
-- [ ] **Phase 3: Android Mobile App (Expo)** — Volunteer driver dispatch, native background location broadcasts, turn-by-turn navigation deep links, recipient mobile client. *(In progress)*
-- [ ] **Phase 4: Realtime Chat & Dish Catalog** — Integrated 3-way in-app chat (canteen, NGO, driver), unread badges, autocomplete catalog with fuzzy dish matching.
-- [ ] **Phase 5: Production Hardening & Automation** — Supabase keep-alive cron job, error tracking, end-to-end integration tests, Vercel & Play Store production release.
+- [x] **Phase 3: Android Mobile App (Expo)** — Standalone signed APK with full cross-role support: volunteer driver dispatch with background GPS broadcasting, recipient find/claim feed, and canteen kitchen portal with on-device ML prep planner. All three roles work natively in the Android app.
+- [x] **Phase 4: Realtime Chat & Dish Catalog** — Integrated 3-way in-app chat (canteen, NGO, driver), unread badges, and autocomplete catalog with fuzzy dish matching.
+- [x] **Phase 5: Production Hardening & Automation** — Supabase keep-alive cron job, signed release APK with automated rclone Google Drive distribution, live Vercel web deployment.
 
 <p align="center">
   <img src="docs/assets/divider.svg" alt="perforated divider" width="100%" />

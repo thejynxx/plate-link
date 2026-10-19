@@ -1,12 +1,12 @@
 import Link from "next/link"
-import { Bike, Building2, HandHeart } from "lucide-react"
+import { Bike, Building2, HandHeart, Smartphone } from "lucide-react"
 import { PREP_MODEL_INFO } from "@platelink/shared/prep-model"
 import { Logo } from "@/components/brand/logo"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { MiniTicket } from "@/components/brand/mini-ticket"
 import { getProfile } from "@/lib/auth"
-import { ROLE_HOME } from "@platelink/shared"
+import { ANDROID_APK_URL, ROLE_HOME } from "@platelink/shared"
 
 const m = PREP_MODEL_INFO.metrics
 
@@ -46,12 +46,18 @@ export default async function Home() {
               Canteens post surplus food in a minute. Nearby NGOs claim it, a volunteer driver picks it up, and everyone
               watches it move on the map until it&apos;s delivered.
             </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Button size="lg" asChild>
                 <Link href="/register">Register your canteen</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <Link href="/register">I&apos;m from an NGO</Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <a href={ANDROID_APK_URL} target="_blank" rel="noopener noreferrer">
+                  <Smartphone className="size-4" />
+                  Get the Android app
+                </a>
               </Button>
             </div>
           </div>

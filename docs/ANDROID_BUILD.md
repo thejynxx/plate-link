@@ -86,3 +86,55 @@ Transfer `dist\plate-link-1.0.0.apk` to your phone via Google Drive, WhatsApp, o
 1. Tap the `.apk` file on your phone.
 2. If prompted, toggle **"Allow from this source"** in Android Settings (*Install unknown apps*).
 3. Tap **Install** and launch **Plate-Link**.
+
+---
+
+## 6. One-Command Google Drive APK Upload (via rclone)
+
+To share the latest APK or install directly onto your Android device without connecting a USB cable, Plate-Link provides a one-command upload script using [rclone](https://rclone.org/).
+
+### Initial Setup (One-Time)
+
+1. **Install rclone on Windows**:
+   ```powershell
+   winget install Rclone.Rclone
+   ```
+   *(Restart your terminal if `rclone` is not recognized immediately)*.
+
+2. **Configure your Google Drive remote**:
+   Run the interactive configuration wizard:
+   ```powershell
+   rclone config
+   ```
+   Follow the prompts:
+   - `n` — New remote
+   - Name: `gdrive`
+   - Storage type: `drive` (Google Drive)
+   - `client_id` / `client_secret`: leave blank (press Enter)
+   - Scope: `drive.file` (or pick the option for *access to files created by rclone only*)
+   - `root_folder_id` / `service_account_file`: leave blank (press Enter)
+   - Edit advanced config: `n`
+   - Use auto config: `y` *(launches your default browser to sign in to Google and authorize)*
+   - Configure as Team Drive: `n`
+   - Confirm and save: `y`, then `q` to quit
+
+> [!NOTE]
+> All credentials and OAuth refresh tokens are stored securely in `%APPDATA%\rclone\rclone.conf` on your machine. No tokens or configs touch the git repository.
+
+### Uploading the Latest APK
+
+From `apps/mobile`, run:
+
+```powershell
+cd apps/mobile
+.\scripts\upload-apk.ps1
+```
+
+### What `upload-apk.ps1` Does:
+1. Automatically picks up the newest APK in `apps/mobile/dist/plate-link-*.apk`.
+2. Overwrites `gdrive:PlateLink/Plate-Link-latest.apk` so the remote file always has a fixed, stable destination.
+3. Sets public link-sharing via `rclone link` and prints the Google Drive share URL.
+4. Generates and displays the direct download link:
+   `https://drive.google.com/uc?export=download&id=<FILE_ID>`
+   *(Opens directly in mobile Chrome/browsers to download and install the APK immediately)*.
+

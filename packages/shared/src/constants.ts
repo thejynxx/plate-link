@@ -57,3 +57,10 @@ export const STORAGE_BUCKETS = {
   foodPhotos: "food-photos",
   deliveryProofs: "delivery-proofs",
 } as const
+
+export const ANDROID_APK_URL =
+  "https://drive.google.com/uc?export=download&id=1UXZTkNJf9QYrcQjHCvD6oBh-UxarlmYx"
+
+export const ANDROID_APK_SHARE_URL =
+  "https://drive.google.com/open?id=1UXZTkNJf9QYrcQjHCvD6oBh-UxarlmYx"
+
