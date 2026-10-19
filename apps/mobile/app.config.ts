@@ -7,7 +7,7 @@ export default ({ config }: ConfigContext): ExpoConfig & { newArchEnabled?: bool
   scheme: "platelink",
   version: "1.0.0",
   orientation: "portrait",
-  icon: "./assets/images/icon.png",
+  icon: "./assets/icon.png",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
   ios: {
@@ -16,11 +16,10 @@ export default ({ config }: ConfigContext): ExpoConfig & { newArchEnabled?: bool
   },
   android: {
     package: "com.platelink.app",
+    versionCode: 1,
     adaptiveIcon: {
       backgroundColor: "#32373B",
-      foregroundImage: "./assets/images/android-icon-foreground.png",
-      backgroundImage: "./assets/images/android-icon-background.png",
-      monochromeImage: "./assets/images/android-icon-monochrome.png",
+      foregroundImage: "./assets/adaptive-icon.png",
     },
     predictiveBackGestureEnabled: false,
     permissions: [
@@ -38,6 +37,7 @@ export default ({ config }: ConfigContext): ExpoConfig & { newArchEnabled?: bool
     favicon: "./assets/images/favicon.png",
   },
   plugins: [
+    "./plugins/withReleaseSigning",
     "expo-router",
     "expo-font",
     "expo-secure-store",
@@ -63,8 +63,8 @@ export default ({ config }: ConfigContext): ExpoConfig & { newArchEnabled?: bool
       "expo-splash-screen",
       {
         backgroundColor: "#32373B",
-        image: "./assets/images/splash-icon.png",
-        imageWidth: 76,
+        image: "./assets/splash.png",
+        imageWidth: 120,
       },
     ],
   ],

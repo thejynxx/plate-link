@@ -31,7 +31,12 @@ function AuthGate() {
     if (session && !profile) return
 
     const rootSegment = segments[0] as string | undefined
-    if (rootSegment === "dev") return
+    if (rootSegment === "dev") {
+      if (!__DEV__) {
+        router.replace("/(auth)/login")
+      }
+      return
+    }
 
     // Root index (/) handles its own initial redirection via app/index.tsx
     if (!rootSegment) return
