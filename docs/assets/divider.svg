@@ -1,0 +1,28 @@
+<svg width="100%" height="12" viewBox="0 0 1200 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @keyframes dashMove {
+      0% {
+        stroke-dashoffset: 0;
+      }
+      100% {
+        stroke-dashoffset: -32;
+      }
+    }
+    .perforated-line {
+      stroke: #F4B860;
+      stroke-width: 2;
+      stroke-dasharray: 8 8;
+      stroke-linecap: round;
+      opacity: 0.75;
+      animation: dashMove 2.5s linear infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .perforated-line {
+        animation: none !important;
+      }
+    }
+  </style>
+  <circle cx="6" cy="6" r="3.5" fill="#F4B860" opacity="0.8"/>
+  <line x1="16" y1="6" x2="1184" y2="6" class="perforated-line"/>
+  <circle cx="1194" cy="6" r="3.5" fill="#F4B860" opacity="0.8"/>
+</svg>

@@ -1,0 +1,313 @@
+<svg width="100%" height="auto" viewBox="0 0 1280 320" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bannerBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#32373B"/>
+      <stop offset="100%" stop-color="#4A5859"/>
+    </linearGradient>
+
+    <!-- Subtle Diagonal Grain Pattern -->
+    <pattern id="grainPattern" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="3" r="0.75" fill="#F4D6CC" fill-opacity="0.04"/>
+      <circle cx="15" cy="15" r="0.75" fill="#F4D6CC" fill-opacity="0.04"/>
+      <circle cx="9" cy="21" r="0.5" fill="#F4B860" fill-opacity="0.03"/>
+    </pattern>
+
+    <!-- Ticket Drop Shadow -->
+    <filter id="ticketShadow" x="-15%" y="-15%" width="135%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#181B1D" flood-opacity="0.6"/>
+    </filter>
+
+    <!-- Glow for Delivery Pin -->
+    <filter id="dotGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3.5" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Reusable Ticket Shape (Width 186, Height 224, Corner R 10, Notch R 8 at Y 72) -->
+    <path id="ticketShape" d="
+      M 10 0
+      H 176
+      A 10 10 0 0 1 186 10
+      V 64
+      A 8 8 0 0 0 186 80
+      V 214
+      A 10 10 0 0 1 176 224
+      H 10
+      A 10 10 0 0 1 0 214
+      V 80
+      A 8 8 0 0 0 0 64
+      V 10
+      A 10 10 0 0 1 10 0
+      Z" />
+  </defs>
+
+  <style>
+    /* System grotesque typography */
+    .title-font {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-weight: 800;
+      letter-spacing: -2px;
+    }
+    .body-font {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .mono-font {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    /* Floating tickets animations (staggered 0s, 0.6s, 1.2s, 4s cycle) */
+    @keyframes floatTicket {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+    .float-0 {
+      animation: floatTicket 4s ease-in-out infinite 0s;
+    }
+    .float-1 {
+      animation: floatTicket 4s ease-in-out infinite 0.6s;
+    }
+    .float-2 {
+      animation: floatTicket 4s ease-in-out infinite 1.2s;
+    }
+
+    /* Tagline fade in animation */
+    @keyframes taglineFade {
+      0% {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0px);
+      }
+    }
+    .tagline-anim {
+      opacity: 1;
+      animation: taglineFade 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    /* Pulse animation for status indicator */
+    @keyframes pulseRing {
+      0% {
+        r: 3.5px;
+        opacity: 0.9;
+      }
+      50% {
+        r: 6.5px;
+        opacity: 0.2;
+      }
+      100% {
+        r: 3.5px;
+        opacity: 0.9;
+      }
+    }
+    .pulse-dot {
+      animation: pulseRing 2s ease-in-out infinite;
+    }
+
+    /* Accessibility: Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, .float-0, .float-1, .float-2, .tagline-anim, .pulse-dot {
+        animation: none !important;
+      }
+    }
+  </style>
+
+  <!-- Canvas Background -->
+  <rect width="1280" height="320" fill="url(#bannerBg)"/>
+  <rect width="1280" height="320" fill="url(#grainPattern)"/>
+  <rect x="0.5" y="0.5" width="1279" height="319" fill="none" stroke="#F4D6CC" stroke-opacity="0.08"/>
+
+  <!-- Subtle ambient decorative lines in background -->
+  <line x1="72" y1="44" x2="600" y2="44" stroke="#4A5859" stroke-opacity="0.3" stroke-width="1"/>
+
+  <!-- ==================== LEFT BRANDING ==================== -->
+  <!-- Live Status Kicker Badge -->
+  <g transform="translate(72, 58)">
+    <rect x="0" y="0" width="194" height="26" rx="13" fill="#32373B" stroke="#4A5859" stroke-width="1"/>
+    <circle cx="14" cy="13" r="5" fill="#F4B860" fill-opacity="0.3" class="pulse-dot"/>
+    <circle cx="14" cy="13" r="3.5" fill="#F4B860"/>
+    <text x="26" y="17" class="body-font" font-size="10.5" font-weight="700" fill="#F4D6CC" letter-spacing="1.2px">LIVE SURPLUS DISPATCH</text>
+  </g>
+
+  <!-- Big Grotesque Logo -->
+  <text x="70" y="152" class="title-font" font-size="88" fill="#F4D6CC">Plate-Link</text>
+
+  <!-- Tagline (Honey #F4B860, ~26px, Fades In) -->
+  <g class="tagline-anim">
+    <text x="73" y="196" class="body-font" font-size="25" font-weight="600" fill="#F4B860" letter-spacing="-0.3px">
+      Tonight&apos;s leftovers, on someone&apos;s plate by nine.
+    </text>
+  </g>
+
+  <!-- Role Workflow Micro-Pills -->
+  <g transform="translate(72, 230)">
+    <!-- Pill 1: Canteen -->
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="144" height="30" rx="15" fill="#2B3034" stroke="#4A5859" stroke-width="1"/>
+      <circle cx="14" cy="15" r="4" fill="#F4B860"/>
+      <text x="25" y="19" class="body-font" font-size="11" font-weight="600" fill="#F4D6CC">Canteens: Post</text>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 154 15 L 164 15 M 160 11 L 165 15 L 160 19" stroke="#F4B860" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+
+    <!-- Pill 2: NGO Claim -->
+    <g transform="translate(175, 0)">
+      <rect x="0" y="0" width="138" height="30" rx="15" fill="#2B3034" stroke="#4A5859" stroke-width="1"/>
+      <circle cx="14" cy="15" r="4" fill="#F4D6CC"/>
+      <text x="25" y="19" class="body-font" font-size="11" font-weight="600" fill="#F4D6CC">NGOs: Claim</text>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 323 15 L 333 15 M 329 11 L 334 15 L 329 19" stroke="#F4B860" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+
+    <!-- Pill 3: Driver Deliver -->
+    <g transform="translate(344, 0)">
+      <rect x="0" y="0" width="150" height="30" rx="15" fill="#2B3034" stroke="#4A5859" stroke-width="1"/>
+      <circle cx="14" cy="15" r="4" fill="#C83E4D"/>
+      <text x="25" y="19" class="body-font" font-size="11" font-weight="600" fill="#F4D6CC">Drivers: Deliver</text>
+    </g>
+  </g>
+
+  <!-- ==================== ROUTE PATH & TRAVELING SCOOTER PIN ==================== -->
+  <!-- Closed loop route traveling across tickets and returning gracefully -->
+  <path id="routeTrajectory" d="
+    M 670,225
+    C 740,165 790,260 865,200
+    C 940,150 1005,250 1080,195
+    C 1145,150 1205,215 1165,270
+    C 1075,305 930,290 805,285
+    C 725,280 630,270 670,225
+    Z"
+    fill="none" stroke="#F4B860" stroke-width="2.5" stroke-dasharray="6 6" stroke-opacity="0.45" stroke-linecap="round"/>
+
+  <!-- Traveling Delivery Scooter / Pin Marker (6s loop) -->
+  <g>
+    <!-- Outer Honey Pulse Ring -->
+    <circle r="12" fill="#F4B860" fill-opacity="0.25">
+      <animate attributeName="r" values="8;16;8" dur="1.5s" repeatCount="indefinite"/>
+      <animate attributeName="fill-opacity" values="0.35;0.05;0.35" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <!-- Solid Honey Pin Head -->
+    <circle r="7.5" fill="#F4B860" stroke="#32373B" stroke-width="2" filter="url(#dotGlow)"/>
+    <!-- Scooter/Pin Center -->
+    <circle r="2.8" fill="#32373B"/>
+    <!-- animateMotion follows trajectory path -->
+    <animateMotion dur="6s" repeatCount="indefinite" rotate="auto">
+      <mpath href="#routeTrajectory" xlink:href="#routeTrajectory"/>
+    </animateMotion>
+  </g>
+
+  <!-- ==================== THREE FANNED TICKETS ==================== -->
+
+  <!-- TICKET 1: AVAILABLE (Angle -6°, Stagger 0s, Honey #F4B860) -->
+  <g transform="translate(660, 48) rotate(-6 93 112)">
+    <g class="float-0">
+      <!-- Ticket Base Card with Notches -->
+      <use href="#ticketShape" xlink:href="#ticketShape" fill="#252A2D" stroke="#4A5859" stroke-width="1.5" filter="url(#ticketShadow)"/>
+
+      <!-- Top Header: Available Pill -->
+      <rect x="14" y="14" width="88" height="22" rx="11" fill="#F4B860" fill-opacity="0.18" stroke="#F4B860" stroke-opacity="0.6" stroke-width="1"/>
+      <circle cx="24" cy="25" r="3.5" fill="#F4B860"/>
+      <text x="33" y="29" class="body-font" font-size="10" font-weight="800" fill="#F4B860" letter-spacing="0.6px">AVAILABLE</text>
+
+      <!-- Portions Count -->
+      <text x="172" y="34" class="title-font" font-size="24" font-weight="800" fill="#F4D6CC" text-anchor="end">45</text>
+      <text x="172" y="50" class="body-font" font-size="10" font-weight="600" fill="#9BA6AB" text-anchor="end">portions</text>
+
+      <!-- Ticket Perforation Line -->
+      <line x1="12" y1="72" x2="174" y2="72" stroke="#4A5859" stroke-width="1.5" stroke-dasharray="4 3" stroke-opacity="0.85"/>
+
+      <!-- Ticket Body -->
+      <text x="16" y="98" class="body-font" font-size="14.5" font-weight="700" fill="#FFFFFF">Paneer Biryani</text>
+      <text x="16" y="117" class="body-font" font-size="11" fill="#9BA6AB">North Campus Mess</text>
+
+      <line x1="16" y1="132" x2="170" y2="132" stroke="#4A5859" stroke-opacity="0.35" stroke-width="1"/>
+
+      <text x="16" y="152" class="body-font" font-size="10" font-weight="600" fill="#F4D6CC">Prep: 18:00 · Veg</text>
+      <text x="16" y="172" class="body-font" font-size="10" font-weight="600" fill="#F4B860">Expires: 21:00 (3h left)</text>
+
+      <!-- Ticket Footer Bar -->
+      <rect x="14" y="190" width="158" height="22" rx="4" fill="#1C2023"/>
+      <text x="22" y="204.5" class="mono-font" font-size="9" fill="#727E85">#PL-8421</text>
+      <text x="164" y="204.5" class="body-font" font-size="9.5" font-weight="700" fill="#F4B860" text-anchor="end">READY</text>
+    </g>
+  </g>
+
+  <!-- TICKET 2: CLAIMED (Angle +3°, Stagger 0.6s, Almond Silk #F4D6CC) -->
+  <g transform="translate(830, 46) rotate(3 93 112)">
+    <g class="float-1">
+      <!-- Ticket Base Card with Notches -->
+      <use href="#ticketShape" xlink:href="#ticketShape" fill="#252A2D" stroke="#4A5859" stroke-width="1.5" filter="url(#ticketShadow)"/>
+
+      <!-- Top Header: Claimed Pill -->
+      <rect x="14" y="14" width="80" height="22" rx="11" fill="#F4D6CC" fill-opacity="0.18" stroke="#F4D6CC" stroke-opacity="0.6" stroke-width="1"/>
+      <circle cx="24" cy="25" r="3.5" fill="#F4D6CC"/>
+      <text x="33" y="29" class="body-font" font-size="10" font-weight="800" fill="#F4D6CC" letter-spacing="0.6px">CLAIMED</text>
+
+      <!-- Portions Count -->
+      <text x="172" y="34" class="title-font" font-size="24" font-weight="800" fill="#F4D6CC" text-anchor="end">80</text>
+      <text x="172" y="50" class="body-font" font-size="10" font-weight="600" fill="#9BA6AB" text-anchor="end">portions</text>
+
+      <!-- Ticket Perforation Line -->
+      <line x1="12" y1="72" x2="174" y2="72" stroke="#4A5859" stroke-width="1.5" stroke-dasharray="4 3" stroke-opacity="0.85"/>
+
+      <!-- Ticket Body -->
+      <text x="16" y="98" class="body-font" font-size="14.5" font-weight="700" fill="#FFFFFF">Dal Makhani &amp; Roti</text>
+      <text x="16" y="117" class="body-font" font-size="11" fill="#9BA6AB">Central Tech Pantry</text>
+
+      <line x1="16" y1="132" x2="170" y2="132" stroke="#4A5859" stroke-opacity="0.35" stroke-width="1"/>
+
+      <text x="16" y="152" class="body-font" font-size="10" font-weight="600" fill="#F4D6CC">NGO: Robin Hood Army</text>
+      <text x="16" y="172" class="body-font" font-size="10" font-weight="600" fill="#F4D6CC">Driver: Priya S. (assigned)</text>
+
+      <!-- Ticket Footer Bar -->
+      <rect x="14" y="190" width="158" height="22" rx="4" fill="#1C2023"/>
+      <text x="22" y="204.5" class="mono-font" font-size="9" fill="#727E85">#PL-8419</text>
+      <text x="164" y="204.5" class="body-font" font-size="9.5" font-weight="700" fill="#F4D6CC" text-anchor="end">IN TRANSIT</text>
+    </g>
+  </g>
+
+  <!-- TICKET 3: DELIVERED (Angle -2°, Stagger 1.2s, Blushed Brick #C83E4D) -->
+  <g transform="translate(1000, 48) rotate(-2 93 112)">
+    <g class="float-2">
+      <!-- Ticket Base Card with Notches -->
+      <use href="#ticketShape" xlink:href="#ticketShape" fill="#252A2D" stroke="#4A5859" stroke-width="1.5" filter="url(#ticketShadow)"/>
+
+      <!-- Top Header: Delivered Pill -->
+      <rect x="14" y="14" width="90" height="22" rx="11" fill="#C83E4D" fill-opacity="0.22" stroke="#C83E4D" stroke-opacity="0.7" stroke-width="1"/>
+      <circle cx="24" cy="25" r="3.5" fill="#C83E4D"/>
+      <text x="33" y="29" class="body-font" font-size="10" font-weight="800" fill="#C83E4D" letter-spacing="0.6px">DELIVERED</text>
+
+      <!-- Portions Count -->
+      <text x="172" y="34" class="title-font" font-size="24" font-weight="800" fill="#F4D6CC" text-anchor="end">120</text>
+      <text x="172" y="50" class="body-font" font-size="10" font-weight="600" fill="#9BA6AB" text-anchor="end">portions</text>
+
+      <!-- Ticket Perforation Line -->
+      <line x1="12" y1="72" x2="174" y2="72" stroke="#4A5859" stroke-width="1.5" stroke-dasharray="4 3" stroke-opacity="0.85"/>
+
+      <!-- Ticket Body -->
+      <text x="16" y="98" class="body-font" font-size="14.5" font-weight="700" fill="#FFFFFF">Veg Pulao &amp; Curry</text>
+      <text x="16" y="117" class="body-font" font-size="11" fill="#9BA6AB">Royal Caterers Hub</text>
+
+      <line x1="16" y1="132" x2="170" y2="132" stroke="#4A5859" stroke-opacity="0.35" stroke-width="1"/>
+
+      <text x="16" y="152" class="body-font" font-size="10" font-weight="600" fill="#F4D6CC">Drop-off: Shelter Home #4</text>
+      <text x="16" y="172" class="body-font" font-size="10" font-weight="600" fill="#C83E4D">Completed at 20:45</text>
+
+      <!-- Ticket Footer Bar -->
+      <rect x="14" y="190" width="158" height="22" rx="4" fill="#1C2023"/>
+      <text x="22" y="204.5" class="mono-font" font-size="9" fill="#727E85">#PL-8415</text>
+      <text x="164" y="204.5" class="body-font" font-size="9.5" font-weight="700" fill="#C83E4D" text-anchor="end">FULFILLED</text>
+    </g>
+  </g>
+</svg>
