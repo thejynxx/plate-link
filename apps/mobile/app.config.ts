@@ -23,6 +23,14 @@ export default ({ config }: ConfigContext): ExpoConfig & { newArchEnabled?: bool
       monochromeImage: "./assets/images/android-icon-monochrome.png",
     },
     predictiveBackGestureEnabled: false,
+    permissions: [
+      "ACCESS_FINE_LOCATION",
+      "ACCESS_COARSE_LOCATION",
+      "ACCESS_BACKGROUND_LOCATION",
+      "FOREGROUND_SERVICE",
+      "FOREGROUND_SERVICE_LOCATION",
+      "POST_NOTIFICATIONS",
+    ],
   },
   web: {
     bundler: "metro",
@@ -32,6 +40,17 @@ export default ({ config }: ConfigContext): ExpoConfig & { newArchEnabled?: bool
     "expo-router",
     "expo-font",
     "expo-secure-store",
+    "@maplibre/maplibre-react-native",
+    [
+      "expo-location",
+      {
+        locationWhenInUsePermission: "Plate-Link uses your location to show nearby pickups.",
+        locationAlwaysAndWhenInUsePermission:
+          "Plate-Link shares your location with the canteen and NGO only while you have an active delivery.",
+        isAndroidBackgroundLocationEnabled: true,
+        isAndroidForegroundServiceEnabled: true,
+      },
+    ],
     [
       "expo-splash-screen",
       {
