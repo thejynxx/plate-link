@@ -58,6 +58,9 @@ function AuthGate() {
       return
     }
 
+    // Allow chat screens outside tab groups for authenticated users
+    if (rootSegment === "chat") return
+
     if (role === "driver" && rootSegment !== "(driver)") {
       router.replace("/(driver)")
     } else if (role === "user" && rootSegment !== "(recipient)") {
@@ -79,6 +82,7 @@ function AuthGate() {
       <Stack.Screen name="(driver)" />
       <Stack.Screen name="(recipient)" />
       <Stack.Screen name="canteen" />
+      <Stack.Screen name="chat/[id]" />
       <Stack.Screen name="+not-found" />
     </Stack>
   )

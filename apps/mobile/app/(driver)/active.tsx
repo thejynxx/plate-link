@@ -52,6 +52,7 @@ import {
   MAP_STYLE_DARK,
   MAP_STYLE_LIGHT,
   navigationUrl,
+  openOrderChat,
   palette,
 } from "@platelink/shared"
 import {
@@ -136,6 +137,7 @@ export default function DriverActiveScreen() {
   >(null)
   const [capturedPhotoUri, setCapturedPhotoUri] = useState<string | null>(null)
   const [isSubmittingProof, setIsSubmittingProof] = useState(false)
+  const [isOpeningChat, setIsOpeningChat] = useState(false)
 
   // Success completed animation
   const [isDeliveredSuccess, setIsDeliveredSuccess] = useState(false)
@@ -393,7 +395,25 @@ export default function DriverActiveScreen() {
     }
   }
 
-  // 8. Open proof photo sheet
+  // 8. Open direct order chat
+  const handleOpenChat = async () => {
+    if (!activeOrder?.id) return
+    setIsOpeningChat(true)
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {})
+      const conversationId = await openOrderChat(supabase, activeOrder.id)
+      router.push(`/chat/${conversationId}` as any)
+    } catch (err: any) {
+      Alert.alert(
+        "Unable to open chat",
+        err?.message ?? "Could not connect to conversation. Please try again."
+      )
+    } finally {
+      setIsOpeningChat(false)
+    }
+  }
+
+  // 9. Open proof photo sheet
   const handleOpenProofModal = (status: "picked_up" | "delivered") => {
     try {
       Haptics.selectionAsync().catch(() => {})
@@ -995,15 +1015,11 @@ export default function DriverActiveScreen() {
                 <PressButton
                   variant="outline"
                   size="sm"
-                  onPress={() => {
-                    Alert.alert(
-                      "Chat coming soon",
-                      "Direct order chat with canteen and recipient will be available in Phase 3.5b."
-                    )
-                  }}
+                  onPress={() => void handleOpenChat()}
+                  loading={isOpeningChat}
                   leftIcon={<MessageSquare size={16} color={theme.colors.ink} />}
                   style={{ flex: 1 }}
-                  accessibilityLabel="Message canteen"
+                  accessibilityLabel="Message canteen and recipient"
                 >
                   Message
                 </PressButton>

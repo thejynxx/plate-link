@@ -1,10 +1,7 @@
 import React from "react"
-import { ScrollView, StyleSheet, View } from "react-native"
-import { MessageSquare } from "lucide-react-native"
-import {
-  ChromeHeader,
-  EmptyState,
-} from "@/components/ui"
+import { StyleSheet, View } from "react-native"
+import { ChromeHeader } from "@/components/ui"
+import { ChatInbox } from "@/components/chat/inbox"
 import { useTheme } from "@/theme"
 
 export default function DriverMessagesScreen() {
@@ -14,16 +11,12 @@ export default function DriverMessagesScreen() {
     <View style={[styles.root, { backgroundColor: theme.colors.canvas }]}>
       <ChromeHeader
         title="Messages"
-        subtitle="Delivery order discussions"
+        subtitle="Order coordination & discussions"
       />
 
-      <ScrollView contentContainerStyle={styles.content}>
-        <EmptyState
-          icon={<MessageSquare size={28} color={theme.palette.honeyBronze} />}
-          title="Order chats — coming in Phase 4"
-          description="Direct chat with canteens and recipient shelters will activate with active orders."
-        />
-      </ScrollView>
+      <View style={styles.content}>
+        <ChatInbox />
+      </View>
     </View>
   )
 }
@@ -33,6 +26,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 20,
+    flex: 1,
   },
 })
