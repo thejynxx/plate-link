@@ -1,0 +1,31 @@
+name: Keep-Alive (Supabase & Vercel)
+
+on:
+  schedule:
+    # Runs every 3 days at 06:00 UTC to prevent free-tier Supabase pause
+    - cron: "0 6 */3 * *"
+  workflow_dispatch:
+
+jobs:
+  keepalive:
+    name: Ping Services
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST API
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          echo "Pinging Supabase REST endpoint..."
+          curl --fail --show-error --silent \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            "${SUPABASE_URL}/rest/v1/canteens?select=id&limit=1" > /dev/null
+          echo "Supabase ping successful."
+
+      - name: Ping Vercel Production
+        run: |
+          echo "Pinging Vercel deployment..."
+          curl --fail --show-error --silent \
+            "https://plate-link-sigma.vercel.app" > /dev/null
+          echo "Vercel ping successful."

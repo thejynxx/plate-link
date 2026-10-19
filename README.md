@@ -372,6 +372,7 @@ Plate-Link keeps secrets strictly out of version control. Below are the required
 | :--- | :--- | :--- |
 | `EXPO_PUBLIC_SUPABASE_URL` | Supabase project API URL (`https://<project-ref>.supabase.co`) | Public / Client |
 | `EXPO_PUBLIC_SUPABASE_ANON_KEY` | Supabase publishable anonymous JWT key | Public / Client |
+| `EXPO_PUBLIC_WEB_URL` | Web deployment URL for mobile deep-links and routes API (`https://plate-link-sigma.vercel.app` in prod, `http://127.0.0.1:3000` in dev) | Public / Client |
 
 </details>
 
@@ -400,20 +401,36 @@ To test real-time claim state transitions before driver assignment:
 
 </details>
 
-<details>
-<summary><strong>7. Deploying to Vercel</strong></summary>
+<details open>
+<summary><strong>7. Deploy the web app</strong></summary>
 
+Live URL: **[https://plate-link-sigma.vercel.app](https://plate-link-sigma.vercel.app)**
+
+#### Vercel Configuration
 1. Push your repository to GitHub.
 2. In the [Vercel Dashboard](https://vercel.com/new), import the repository:
    - Set **Root Directory** to `apps/web`.
-   - Add environment variables:
+   - Add the following environment variable names (names only, never commit secret values):
      - `NEXT_PUBLIC_SUPABASE_URL`
      - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-     - `ORS_API_KEY` *(optional, for route calculation)*
+     - `ORS_API_KEY` *(OpenRouteService server-side API token for `/api/routes`)*
 3. Click **Deploy**.
-4. Once deployed, add your Vercel production domain and callback URL (`https://<your-domain>/auth/callback`) to **Supabase** → **Authentication** → **URL Configuration**.
 
-> **Note**: Free-tier Supabase projects pause after 7 days of inactivity. Simply ping the app or database to resume before demos.
+#### Supabase Authentication → URL Configuration
+Once the Vercel deployment is active, navigate to your **Supabase Dashboard** → **Authentication** → **URL Configuration**:
+- **Site URL**: `https://plate-link-sigma.vercel.app`
+- **Redirect URLs**:
+  - Keep existing localhost redirects for local development (`http://localhost:3000/**`, `http://127.0.0.1:3000/**`)
+  - Add production callback URL: `https://plate-link-sigma.vercel.app/auth/callback`
+
+#### Automated Keep-Alive Workflow
+Free-tier Supabase projects pause after 7 days of inactivity. Plate-Link includes an automated GitHub Actions workflow (`.github/workflows/keepalive.yml`) running on a cron schedule every 3 days (`0 6 */3 * *`) and on `workflow_dispatch`.
+
+To enable it, configure repository secrets in GitHub under **Settings** → **Secrets and variables** → **Actions**:
+- `SUPABASE_URL`: Your Supabase project URL (`https://<project-ref>.supabase.co`)
+- `SUPABASE_ANON_KEY`: Your Supabase anonymous public API key
+
+The workflow curls `${SUPABASE_URL}/rest/v1/canteens?select=id&limit=1` using `apikey` and `Authorization: Bearer` headers (failing the job on non-2xx via `curl --fail`) and also pings the live Vercel production home page.
 
 </details>
 

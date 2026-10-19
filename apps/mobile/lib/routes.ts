@@ -24,7 +24,8 @@ export async function fetchRoute(
       return null
     }
 
-    const baseUrl = process.env.EXPO_PUBLIC_WEB_URL ?? "http://127.0.0.1:3000"
+    const baseUrl =
+      process.env.EXPO_PUBLIC_WEB_URL || "https://plate-link-sigma.vercel.app"
 
     const {
       data: { session },
