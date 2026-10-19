@@ -9,7 +9,7 @@ import {
 } from "react-native"
 import Svg, { Line } from "react-native-svg"
 import { Image } from "expo-image"
-import type { ListingStatus } from "@platelink/shared"
+import type { ListingStatus, OrderStatus } from "@platelink/shared"
 import { useTheme } from "@/theme"
 import { Badge } from "./badge"
 import { Text } from "./text"
@@ -17,7 +17,7 @@ import { Text } from "./text"
 export interface TicketCardProps {
   title: string
   portions: number
-  status: ListingStatus
+  status: ListingStatus | OrderStatus
   meta?: string
   expiryText?: string
   actionText?: string

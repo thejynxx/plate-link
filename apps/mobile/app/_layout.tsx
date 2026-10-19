@@ -58,8 +58,8 @@ function AuthGate() {
       return
     }
 
-    // Allow chat screens outside tab groups for authenticated users
-    if (rootSegment === "chat") return
+    // Allow stack screens outside tab groups for authenticated users
+    if (rootSegment === "chat" || rootSegment === "listing" || rootSegment === "order") return
 
     if (role === "driver" && rootSegment !== "(driver)") {
       router.replace("/(driver)")
@@ -83,6 +83,8 @@ function AuthGate() {
       <Stack.Screen name="(recipient)" />
       <Stack.Screen name="canteen" />
       <Stack.Screen name="chat/[id]" />
+      <Stack.Screen name="listing/[id]" />
+      <Stack.Screen name="order/[id]" />
       <Stack.Screen name="+not-found" />
     </Stack>
   )
