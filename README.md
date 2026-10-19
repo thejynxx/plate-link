@@ -253,7 +253,7 @@ Evaluated on **28,535 test rows** across weeks 136–145:
   <tbody>
     <tr>
       <td align="center">
-        <img src="docs/screenshots/landing.png" alt="Role Home &amp; Ticket Dashboard" width="100%" />
+        <img src="docs/screenshots/canteen-home.png" alt="Role Home &amp; Ticket Dashboard" width="100%" />
       </td>
       <td align="center">
         <img src="docs/screenshots/feed-map.png" alt="Recipient Feed &amp; MapLibre Map" width="100%" />

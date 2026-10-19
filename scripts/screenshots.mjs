@@ -7,6 +7,7 @@ import path from "node:path"
 import { fileURLToPath } from "node:url"
 import { chromium } from "playwright"
 import sharp from "sharp"
+import { createClient } from "@supabase/supabase-js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -15,34 +16,98 @@ const SCREENSHOTS_DIR = path.join(ROOT_DIR, "docs", "screenshots")
 
 const BASE_URL = process.env.PL_BASE_URL || "https://plate-link-sigma.vercel.app"
 
-const CANTEEN_EMAIL = process.env.PL_CANTEEN_EMAIL
-const CANTEEN_PASSWORD = process.env.PL_CANTEEN_PASSWORD
-const NGO_EMAIL = process.env.PL_NGO_EMAIL
-const NGO_PASSWORD = process.env.PL_NGO_PASSWORD
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://mjverufnlbxozbtvfvby.supabase.co"
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publishable_04dwEDbtYjskW_OoLomDKg_AExOOB-X"
 
-function checkEnv() {
-  const missing = []
-  if (!CANTEEN_EMAIL) missing.push("PL_CANTEEN_EMAIL")
-  if (!CANTEEN_PASSWORD) missing.push("PL_CANTEEN_PASSWORD")
-  if (!NGO_EMAIL) missing.push("PL_NGO_EMAIL")
-  if (!NGO_PASSWORD) missing.push("PL_NGO_PASSWORD")
+let CANTEEN_EMAIL = process.env.PL_CANTEEN_EMAIL
+let CANTEEN_PASSWORD = process.env.PL_CANTEEN_PASSWORD
+let NGO_EMAIL = process.env.PL_NGO_EMAIL
+let NGO_PASSWORD = process.env.PL_NGO_PASSWORD
 
-  if (missing.length > 0) {
-    console.error("=================================================================")
-    console.error("  Missing required environment variables for screenshots:")
-    for (const m of missing) {
-      console.error(`    - ${m}`)
-    }
-    console.error("")
-    console.error("  Please set them in PowerShell before running this script:")
-    console.error('    $env:PL_CANTEEN_EMAIL = "canteen@example.com"')
-    console.error('    $env:PL_CANTEEN_PASSWORD = "your-password"')
-    console.error('    $env:PL_NGO_EMAIL = "ngo@example.com"')
-    console.error('    $env:PL_NGO_PASSWORD = "your-password"')
-    console.error("    node scripts/screenshots.mjs")
-    console.error("=================================================================")
-    process.exit(1)
+async function ensureAccounts() {
+  if (CANTEEN_EMAIL && CANTEEN_PASSWORD && NGO_EMAIL && NGO_PASSWORD) {
+    console.log("Using credentials from environment variables.")
+    return
   }
+
+  console.log("Environment variables not set. Auto-provisioning demo accounts on Supabase...")
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  const ts = Date.now()
+
+  // 1. Canteen
+  CANTEEN_EMAIL = `canteen.${ts}@platelink.local`
+  CANTEEN_PASSWORD = `Password123!${ts}`
+  const { data: canteenAuth, error: cAuthErr } = await sb.auth.signUp({
+    email: CANTEEN_EMAIL,
+    password: CANTEEN_PASSWORD,
+    options: { data: { role: "canteen", name: "Campus Central Dining" } },
+  })
+  if (cAuthErr) throw new Error(`Canteen signUp failed: ${cAuthErr.message}`)
+
+  const canteenSb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false } })
+  await canteenSb.auth.setSession({
+    access_token: canteenAuth.session.access_token,
+    refresh_token: canteenAuth.session.refresh_token,
+  })
+
+  await canteenSb.from("canteens").insert({
+    id: canteenAuth.user.id,
+    org_name: "Campus Central Dining Hall",
+    address: "Anna University, Sardar Patel Rd, Guindy, Chennai",
+    location_lat: 13.0102,
+    location_lng: 80.2355,
+    pickup_instructions: "Kitchen entrance near Food Court Gate 2",
+  })
+
+  const { data: listings } = await canteenSb.from("food_listings").insert([
+    {
+      canteen_id: canteenAuth.user.id,
+      title: "Veg biryani & raita",
+      description: "Fresh aromatic biryani with cucumber raita, prepared today at 18:00.",
+      food_type: "veg",
+      quantity: 45,
+      status: "available",
+      expires_at: new Date(Date.now() + 3 * 3600 * 1000).toISOString(),
+    },
+    {
+      canteen_id: canteenAuth.user.id,
+      title: "Chapati & dal makhani",
+      description: "Warm whole wheat chapatis with slow-cooked dal.",
+      food_type: "veg",
+      quantity: 35,
+      status: "available",
+      expires_at: new Date(Date.now() + 4 * 3600 * 1000).toISOString(),
+    },
+  ]).select()
+
+  // 2. NGO
+  NGO_EMAIL = `ngo.${ts}@platelink.local`
+  NGO_PASSWORD = `Password123!${ts}`
+  const { data: ngoAuth, error: nAuthErr } = await sb.auth.signUp({
+    email: NGO_EMAIL,
+    password: NGO_PASSWORD,
+    options: { data: { role: "user", name: "Anbu Children Shelter" } },
+  })
+  if (nAuthErr) throw new Error(`NGO signUp failed: ${nAuthErr.message}`)
+
+  const ngoSb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false } })
+  await ngoSb.auth.setSession({
+    access_token: ngoAuth.session.access_token,
+    refresh_token: ngoAuth.session.refresh_token,
+  })
+
+  // 3. Claim one listing so orders & tracking page have real data
+  if (listings && listings[0]) {
+    await ngoSb.rpc("claim_listing", {
+      p_listing_id: listings[0].id,
+      p_dropoff_address: "Anbu Shelter, 12 Railway Border Rd, Tambaram, Chennai",
+      p_dropoff_lat: 12.9249,
+      p_dropoff_lng: 80.1466,
+    })
+  }
+
+  console.log(`  ✓ Provisioned Canteen: ${CANTEEN_EMAIL}`)
+  console.log(`  ✓ Provisioned NGO:     ${NGO_EMAIL}`)
 }
 
 async function compressAndSave(buffer, fileName) {
@@ -56,7 +121,7 @@ async function compressAndSave(buffer, fileName) {
 }
 
 async function main() {
-  checkEnv()
+  await ensureAccounts()
   fs.mkdirSync(SCREENSHOTS_DIR, { recursive: true })
 
   console.log(`Starting screenshot capture against ${BASE_URL} (dark mode, 1440x900 @2x)...`)
@@ -75,7 +140,7 @@ async function main() {
       })
       const page = await context.newPage()
       await page.goto(`${BASE_URL}/`, { waitUntil: "networkidle" })
-      await page.waitForTimeout(1500)
+      await page.waitForTimeout(2000)
       const buffer = await page.screenshot({ fullPage: false })
       await compressAndSave(buffer, "landing.png")
       await context.close()
@@ -96,13 +161,12 @@ async function main() {
     await canteenPage.fill("#password", CANTEEN_PASSWORD)
     await canteenPage.click('button[type="submit"]')
 
-    // Wait for redirect to dashboard/canteen
-    await canteenPage.waitForURL(/canteen|dashboard/, { timeout: 15000 }).catch(() => {})
-    if (canteenPage.url().includes("/login")) {
-      console.warn("  ⚠️ Canteen login might have failed or timed out — check PL_CANTEEN_EMAIL and PL_CANTEEN_PASSWORD.")
-    }
+    await canteenPage.waitForURL(
+      (url) => url.pathname.startsWith("/canteen") || url.pathname.startsWith("/dashboard"),
+      { timeout: 15000 }
+    )
     await canteenPage.goto(`${BASE_URL}/canteen/home`, { waitUntil: "networkidle" })
-    await canteenPage.waitForTimeout(2000)
+    await canteenPage.waitForTimeout(3000)
     const canteenBuffer = await canteenPage.screenshot({ fullPage: false })
     await compressAndSave(canteenBuffer, "canteen-home.png")
 
@@ -111,8 +175,7 @@ async function main() {
     // -------------------------------------------------------------
     console.log("[3/5] Navigating to ML Prep Planner (/canteen/planner)...")
     await canteenPage.goto(`${BASE_URL}/canteen/planner`, { waitUntil: "networkidle" })
-    await canteenPage.waitForTimeout(2500)
-    // Ensure form has values and result board has calculated
+    await canteenPage.waitForTimeout(3000)
     const plannerBuffer = await canteenPage.screenshot({ fullPage: false })
     await compressAndSave(plannerBuffer, "planner.png")
     await canteenContext.close()
@@ -125,7 +188,7 @@ async function main() {
       viewport: { width: 1440, height: 900 },
       deviceScaleFactor: 2,
       colorScheme: "dark",
-      geolocation: { latitude: 13.0827, longitude: 80.2707 },
+      geolocation: { latitude: 13.0102, longitude: 80.2355 },
       permissions: ["geolocation"],
     })
     const ngoPage = await ngoContext.newPage()
@@ -134,13 +197,13 @@ async function main() {
     await ngoPage.fill("#password", NGO_PASSWORD)
     await ngoPage.click('button[type="submit"]')
 
-    await ngoPage.waitForURL(/app|dashboard/, { timeout: 15000 }).catch(() => {})
-    if (ngoPage.url().includes("/login")) {
-      console.warn("  ⚠️ NGO login might have failed or timed out — check PL_NGO_EMAIL and PL_NGO_PASSWORD.")
-    }
+    await ngoPage.waitForURL(
+      (url) => url.pathname.startsWith("/app") || url.pathname.startsWith("/dashboard"),
+      { timeout: 15000 }
+    )
     await ngoPage.goto(`${BASE_URL}/app`, { waitUntil: "networkidle" })
-    // Extra 3.5s for MapLibre tiles and pins to fully render
-    await ngoPage.waitForTimeout(3500)
+    // Extra 4s for MapLibre tiles and pins to fully render
+    await ngoPage.waitForTimeout(4000)
     const feedBuffer = await ngoPage.screenshot({ fullPage: false })
     await compressAndSave(feedBuffer, "feed-map.png")
 
@@ -149,20 +212,16 @@ async function main() {
     // -------------------------------------------------------------
     console.log("[5/5] Navigating to NGO Orders & Tracking (/app/orders)...")
     await ngoPage.goto(`${BASE_URL}/app/orders`, { waitUntil: "networkidle" })
-    await ngoPage.waitForTimeout(2000)
+    await ngoPage.waitForTimeout(2500)
 
-    // Check if an order link exists
     const orderLink = await ngoPage.$('a[href^="/app/orders/"]')
     if (orderLink) {
       console.log("  Found active claim. Navigating to order tracking...")
       const href = await orderLink.getAttribute("href")
       if (href) {
         await ngoPage.goto(`${BASE_URL}${href}`, { waitUntil: "networkidle" })
-        // Extra 3.5s for MapLibre tracking route and telemetry pins
-        await ngoPage.waitForTimeout(3500)
+        await ngoPage.waitForTimeout(4000)
       }
-    } else {
-      console.log("  No active claims found. Capturing Claims list page...")
     }
 
     const trackingBuffer = await ngoPage.screenshot({ fullPage: false })
