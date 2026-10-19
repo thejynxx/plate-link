@@ -484,5 +484,5 @@ plate-link/
 
 <p align="center">
   Maps &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors<br/>
-  Built with care by <strong>Dexter</strong> (<a href="https://github.com/thejynxx">@thejynxx</a>) • Released under the <a href="LICENSE">MIT License</a>
+  Built with care by <strong>Jynxx</strong> (<a href="https://github.com/thejynxx">@thejynxx</a>) • Released under the <a href="LICENSE">MIT License</a>
 </p>
