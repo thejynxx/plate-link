@@ -11,14 +11,17 @@ import { stopLocationUpdatesTask } from "./location-task"
 import { supabase } from "./supabase"
 
 export type UserProfile = Tables<"users">
+export type CanteenRow = Tables<"canteens">
 
 export interface SessionContextValue {
   session: Session | null
   user: User | null
   profile: UserProfile | null
+  canteen: CanteenRow | null
   loading: boolean
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
+  refreshCanteen: () => Promise<void>
 }
 
 const SessionContext = createContext<SessionContextValue | null>(null)
@@ -26,6 +29,7 @@ const SessionContext = createContext<SessionContextValue | null>(null)
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [canteen, setCanteen] = useState<CanteenRow | null>(null)
   const [loading, setLoading] = useState(true)
 
   const loadProfile = useCallback(async (userId: string): Promise<UserProfile | null> => {
@@ -59,6 +63,25 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  const loadCanteen = useCallback(async (userId: string): Promise<CanteenRow | null> => {
+    try {
+      const { data, error } = await supabase
+        .from("canteens")
+        .select("*")
+        .eq("id", userId)
+        .maybeSingle()
+
+      if (error) {
+        console.warn("Failed to load canteen profile:", error.message)
+        return null
+      }
+      return data ?? null
+    } catch (err) {
+      console.warn("Error loading canteen profile:", err)
+      return null
+    }
+  }, [])
+
   // Initialize session on mount
   useEffect(() => {
     let isMounted = true
@@ -73,9 +96,18 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
         if (currentSession?.user) {
           const userProfile = await loadProfile(currentSession.user.id)
-          if (isMounted) setProfile(userProfile)
+          if (isMounted) {
+            setProfile(userProfile)
+            if (userProfile?.role === "canteen") {
+              const canteenData = await loadCanteen(currentSession.user.id)
+              if (isMounted) setCanteen(canteenData)
+            }
+          }
         } else {
-          if (isMounted) setProfile(null)
+          if (isMounted) {
+            setProfile(null)
+            setCanteen(null)
+          }
         }
       } catch (err) {
         console.warn("Error getting initial session:", err)
@@ -98,11 +130,18 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         const userProfile = await loadProfile(newSession.user.id)
         if (isMounted) {
           setProfile(userProfile)
+          if (userProfile?.role === "canteen") {
+            const canteenData = await loadCanteen(newSession.user.id)
+            if (isMounted) setCanteen(canteenData)
+          } else {
+            setCanteen(null)
+          }
           setLoading(false)
         }
       } else {
         if (isMounted) {
           setProfile(null)
+          setCanteen(null)
           setLoading(false)
         }
       }
@@ -112,13 +151,23 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       isMounted = false
       subscription.unsubscribe()
     }
-  }, [loadProfile])
+  }, [loadProfile, loadCanteen])
 
   const refreshProfile = useCallback(async () => {
     if (!session?.user) return
     const userProfile = await loadProfile(session.user.id)
     setProfile(userProfile)
-  }, [session?.user, loadProfile])
+    if (userProfile?.role === "canteen") {
+      const canteenData = await loadCanteen(session.user.id)
+      setCanteen(canteenData)
+    }
+  }, [session?.user, loadProfile, loadCanteen])
+
+  const refreshCanteen = useCallback(async () => {
+    if (!session?.user) return
+    const canteenData = await loadCanteen(session.user.id)
+    setCanteen(canteenData)
+  }, [session?.user, loadCanteen])
 
   const signOut = useCallback(async () => {
     try {
@@ -129,6 +178,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setSession(null)
       setProfile(null)
+      setCanteen(null)
     }
   }, [])
 
@@ -136,9 +186,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     session,
     user: session?.user ?? null,
     profile,
+    canteen,
     loading,
     signOut,
     refreshProfile,
+    refreshCanteen,
   }
 
   return (

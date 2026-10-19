@@ -22,6 +22,7 @@ import { useTheme } from "@/theme"
 const MOBILE_ROLE_OPTIONS: { label: string; value: UserRole }[] = [
   { label: "Driver", value: "driver" },
   { label: "NGO / recipient", value: "user" },
+  { label: "Canteen", value: "canteen" },
 ]
 
 export default function RegisterScreen() {
@@ -49,7 +50,12 @@ export default function RegisterScreen() {
   // Rule 9: Use useWatch, not watch()
   const role = useWatch({ control, name: "role" })
 
-  const nameLabel = role === "user" ? "Organisation name" : "Full name"
+  const nameLabel =
+    role === "user"
+      ? "Organisation name"
+      : role === "canteen"
+        ? "Your name"
+        : "Full name"
 
   const onSubmit = async ({ email, password, role: selectedRole, name, phone }: RegisterInput) => {
     setAuthError(null)

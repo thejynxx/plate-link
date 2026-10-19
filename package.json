@@ -10,6 +10,8 @@
     "db:types": "supabase gen types typescript --project-id $SUPABASE_PROJECT_REF --schema public > packages/shared/src/database.types.ts"
   },
   "devDependencies": {
+    "playwright": "^1.50.0",
+    "sharp": "^0.33.5",
     "supabase": "^2.121.0",
     "turbo": "^2.11.9",
     "typescript": "^5.9.3"

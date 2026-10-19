@@ -8,7 +8,7 @@ import { useSession } from "@/lib/session"
  * load from public.users, then redirects to the appropriate role route.
  */
 export default function IndexScreen() {
-  const { session, profile, loading } = useSession()
+  const { session, profile, canteen, loading } = useSession()
 
   // While checking auth and loading profile from public.users, display branded splash
   if (loading || (session && !profile)) {
@@ -31,7 +31,10 @@ export default function IndexScreen() {
   }
 
   if (role === "canteen") {
-    return <Redirect href="/canteen" />
+    if (!canteen) {
+      return <Redirect href="/canteen" />
+    }
+    return <Redirect href={"/(canteen)" as any} />
   }
 
   // Fallback if role is unrecognised
